@@ -247,13 +247,6 @@ hr.divider{border:none;border-top:1px solid var(--gray-100);margin:20px 0}
       <div class="login-brand-tagline">Votre espace sécurisé de gestion et de ressources</div>
     </div>
     <div class="form-group">
-      <label class="form-label">Société</label>
-      <select class="form-control" id="login-client">
-        <option value="">Sélectionner une société...</option>
-        <option value="anjaly">Groupe ANJALY</option>
-      </select>
-    </div>
-    <div class="form-group">
       <label class="form-label">Rôle</label>
       <div class="role-selector">
         <button class="role-btn" data-role="direction" onclick="selectRole(this)">
@@ -268,9 +261,13 @@ hr.divider{border:none;border-top:1px solid var(--gray-100);margin:20px 0}
       </div>
     </div>
     <div class="form-group">
+      <label class="form-label">Prénom</label>
+      <input class="form-control" id="login-prenom" placeholder="Votre prénom" onkeydown="if(event.key==='Enter')document.getElementById('login-pwd').focus()">
+    </div>
+    <div class="form-group">
       <label class="form-label">Mot de passe</label>
       <input class="form-control" type="password" id="login-pwd" placeholder="Votre mot de passe d'accès" onkeydown="if(event.key==='Enter')doLogin()">
-      <div class="login-error" id="login-error">Mot de passe incorrect. Contactez ChronoDesk.</div>
+      <div class="login-error" id="login-error">Identifiants incorrects. Contactez ChronoDesk.</div>
     </div>
     <button class="btn btn-primary btn-full btn-lg" onclick="doLogin()">
       <i class="ti ti-lock-open"></i> Accéder à l'espace
@@ -358,12 +355,19 @@ hr.divider{border:none;border-top:1px solid var(--gray-100);margin:20px 0}
 /* ══════════════════════════════
    CONFIG — à modifier ici uniquement
 ══════════════════════════════ */
+/* ══════════════════════════════
+   COMPTES UTILISATEURS — ajouter/modifier ici
+   prenom, role (direction|collaboratrice|client), password, initiales
+══════════════════════════════ */
+const USERS = [
+  { prenom: 'Jessica', role: 'direction',      password: 'Jessica-2025!',  initiales: 'JS' },
+  { prenom: 'Alisson', role: 'collaboratrice', password: 'Alisson-2025!',  initiales: 'AL' },
+  { prenom: 'Emilie',  role: 'collaboratrice', password: 'Emilie-2025!',   initiales: 'EM' },
+  { prenom: 'ANJALY',  role: 'client',         password: 'Anjaly-2025!',   initiales: 'AN' },
+];
+
 const CONFIG = {
-  passwords: {
-    direction:      'chrono-direction-2025',
-    collaboratrice: 'chrono-collab-2025',
-    client:         'anjaly-2025'
-  },
+  makeWebhook: 'https://hook.eu2.make.com/eh3svse68ixmo5rzkkiqcpjthcfsua4c',
   // IDs des dossiers Google Drive par société
   // → Drive : clic droit sur le dossier → Partager → "Tout le monde avec le lien" → copier l'ID dans l'URL
   drive: {
@@ -389,6 +393,7 @@ let S = {
   nextId: 3,
   currentPage: 'dashboard',
   currentAnomalie: null,
+  user: null,
   newFiles: [],
   // Calendrier FDR
   calYear: new Date().getFullYear(),
@@ -433,18 +438,23 @@ function selectRole(btn) {
 }
 
 function doLogin() {
-  const client = document.getElementById('login-client').value;
-  const pwd = document.getElementById('login-pwd').value;
-  const err = document.getElementById('login-error');
+  const prenom = document.getElementById('login-prenom').value.trim();
+  const pwd    = document.getElementById('login-pwd').value;
+  const err    = document.getElementById('login-error');
+  // Vérifier rôle sélectionné
   if (!S.role) { err.style.display='block'; err.textContent='Veuillez sélectionner un rôle.'; return; }
-  if (!client) { err.style.display='block'; err.textContent='Veuillez sélectionner une société.'; return; }
-  if (pwd !== CONFIG.passwords[S.role]) { err.style.display='block'; err.textContent='Mot de passe incorrect. Contactez ChronoDesk.'; return; }
+  // Chercher l'utilisateur par prénom + rôle + mot de passe
+  const user = USERS.find(u =>
+    u.prenom.toLowerCase() === prenom.toLowerCase() &&
+    u.role === S.role &&
+    u.password === pwd
+  );
+  if (!user) { err.style.display='block'; err.textContent='Identifiants incorrects. Contactez ChronoDesk.'; return; }
   err.style.display='none';
-  const names = { direction:'Jessica S.', collaboratrice:'Collaboratrice', client:'ANJALY DG' };
-  const inits = { direction:'JS', collaboratrice:'Co', client:'AN' };
-  document.getElementById('sidebar-avatar').textContent = inits[S.role];
-  document.getElementById('sidebar-user-name').textContent = names[S.role];
-  document.getElementById('sidebar-user-role').textContent = ({direction:'Direction',collaboratrice:'Collaboratrice',client:'Client'})[S.role];
+  S.user = user;
+  document.getElementById('sidebar-avatar').textContent = user.initiales;
+  document.getElementById('sidebar-user-name').textContent = user.prenom;
+  document.getElementById('sidebar-user-role').textContent = ({direction:'Direction',collaboratrice:'Collaboratrice',client:'Client'})[user.role];
   document.getElementById('page-login').classList.add('hidden');
   document.getElementById('page-app').classList.remove('hidden');
   showPage('dashboard');
@@ -454,6 +464,8 @@ function doLogout() {
   document.getElementById('page-app').classList.add('hidden');
   document.getElementById('page-login').classList.remove('hidden');
   S.role = '';
+  S.user = null;
+  document.getElementById('login-prenom').value = '';
   document.getElementById('login-pwd').value = '';
   document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('active'));
 }
@@ -639,7 +651,7 @@ function renderFDRPreview(key) {
   // Une fois les IDs configurés, on construira l'URL réelle
   // Pour l'instant : lien vers le dossier Drive du jour
   const driveUrl = fdr?.driveUrl || `https://drive.google.com/drive/folders/${CONFIG.drive.am}`;
-  const isConfigured = CONFIG.drive.am !== '1HsMiyDLKeiO7axEVjuh1tNP6m89XqWv0';
+  const isConfigured = CONFIG.drive.am !== 'REMPLACER_PAR_ID_DOSSIER_DRIVE_AM';
 
   return `
 <div class="fdr-preview">
@@ -803,21 +815,48 @@ function renderAnomaliesNew() {
 </div>`;
 }
 
-function submitAnomalie() {
-  const title=document.getElementById('an-title').value.trim();
-  const desc=document.getElementById('an-desc').value.trim();
-  if(!title||!desc){toast('Merci de remplir le titre et la description.');return;}
+async function submitAnomalie() {
+  const title    = document.getElementById('an-title').value.trim();
+  const desc     = document.getElementById('an-desc').value.trim();
+  if (!title || !desc) { toast('Merci de remplir le titre et la description.'); return; }
+
+  const type     = document.getElementById('an-type').value;
+  const priority = document.getElementById('an-priority').value;
+  const prenom   = S.user ? S.user.prenom : 'Inconnu';
+  const date     = new Date().toLocaleDateString('fr-FR');
+  const fichiers = S.newFiles.map(f => f.name);
+
   S.anomalies.unshift({
-    id:S.nextId++, title,
-    type:document.getElementById('an-type').value,
-    priority:document.getElementById('an-priority').value,
-    status:'open', date:new Date().toLocaleDateString('fr-FR'),
-    author:S.role==='direction'?'Jessica S.':'Collaboratrice',
-    desc, files:S.newFiles.map(f=>f.name), correction:null
+    id: S.nextId++, title, type, priority,
+    status: 'open', date,
+    author: prenom,
+    desc, files: fichiers, correction: null
   });
-  S.newFiles=[];
+  S.newFiles = [];
   updateBadge();
-  toast('Anomalie créée. Notification client envoyée.');
+
+  const payload = {
+    titre:       title,
+    type,
+    priorite:    priority,
+    description: desc,
+    auteur:      prenom,
+    date,
+    fichiers:    fichiers.join(', ') || 'Aucun fichier joint',
+    societe:     'Groupe ANJALY'
+  };
+
+  try {
+    await fetch(CONFIG.makeWebhook, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload)
+    });
+    toast('✅ Anomalie créée — notification envoyée par mail.');
+  } catch(e) {
+    toast('Anomalie créée. Erreur réseau sur la notification.');
+  }
+
   showPage('anomalies');
 }
 
@@ -859,7 +898,35 @@ function renderAnomalieDetail() {
 }
 
 function setStatus(id,s){const a=S.anomalies.find(x=>x.id===id);if(a){a.status=s;updateBadge();showPage('anomalie-detail');toast('Statut mis à jour.');}}
-function resolveAnomalie(id){setStatus(id,'done');toast('Correctif déposé. La collaboratrice a été notifiée.');}
+
+async function resolveAnomalie(id) {
+  const a = S.anomalies.find(x => x.id === id);
+  if (!a) return;
+  setStatus(id, 'done');
+
+  // Notifier la collaboratrice du dépôt de correctif
+  const payload = {
+    titre:       '[CORRECTIF] ' + a.title,
+    type:        a.type,
+    priorite:    a.priority,
+    description: 'Le client ANJALY a déposé un document corrigé pour cette anomalie.',
+    auteur:      'Client ANJALY',
+    date:        new Date().toLocaleDateString('fr-FR'),
+    fichiers:    'Document corrigé joint',
+    societe:     'Groupe ANJALY'
+  };
+
+  try {
+    await fetch(CONFIG.makeWebhook, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload)
+    });
+    toast('✅ Correctif déposé — collaboratrice notifiée par mail.');
+  } catch(e) {
+    toast('Correctif déposé. Erreur réseau sur la notification.');
+  }
+}
 
 function renderRessources() {
   return `
