@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChronoDesk · Portail Ambulances</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+:root {
+  --navy: #0f2942;
+  --navy-light: #162f4a;
+  --teal: #1a6b8a;
+  --teal-light: #e8f4f8;
+  --teal-mid: #c2e0ec;
+  --gold: #f0a500;
+  --gold-light: #fff8e6;
+  --red: #c0392b;
+  --red-light: #fdf0ef;
+  --green: #1a7a4a;
+  --green-light: #eaf5ef;
+  --amber: #e07b00;
+  --amber-light: #fff4e0;
+  --gray-50: #f8f7f5;
+  --gray-100: #f0eeeb;
+  --gray-200: #e2dfd9;
+  --gray-400: #9c9890;
+  --gray-600: #5c5a54;
+  --gray-800: #2c2c2a;
+  --white: #ffffff;
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+  --shadow: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.05);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.1), 0 4px 8px rgba(0,0,0,0.06);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; -webkit-font-smoothing: antialiased; }
+body { font-family: 'Inter', system-ui, sans-serif; background: var(--gray-50); color: var(--gray-800); min-height: 100vh; }
+
+/* ─── UTILS ─── */
+.hidden { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+.text-muted { color: var(--gray-400); }
+.text-sm { font-size: 12px; }
+.text-xs { font-size: 11px; }
+.fw-500 { font-weight: 500; }
+.mt-4 { margin-top: 4px; }
+.mt-8 { margin-top: 8px; }
+.mt-12 { margin-top: 12px; }
+.mt-16 { margin-top: 16px; }
+.mb-12 { margin-bottom: 12px; }
+.mb-16 { margin-bottom: 16px; }
+.gap-8 { gap: 8px; }
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.flex-1 { flex: 1; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+
+/* ─── BADGES & PILLS ─── */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 500; padding: 2px 7px;
+  border-radius: 20px; white-space: nowrap;
+}
+.badge-teal   { background: var(--teal-light); color: #0c3e52; }
+.badge-gold   { background: var(--gold-light); color: #7a4a00; }
+.badge-red    { background: var(--red-light); color: #7a1f1a; }
+.badge-green  { background: var(--green-light); color: #0c3e52; }
+.badge-gray   { background: var(--gray-100); color: var(--gray-600); }
+.badge-navy   { background: var(--navy); color: #fff; }
+
+.status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.dot-open     { background: var(--red); }
+.dot-progress { background: var(--amber); }
+.dot-done     { background: var(--green); }
+
+/* ─── BUTTONS ─── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 500; padding: 8px 16px;
+  border-radius: var(--radius-sm); cursor: pointer;
+  transition: all 0.15s; border: 1px solid transparent;
+  text-decoration: none; white-space: nowrap;
+}
+.btn-primary   { background: var(--teal); color: #fff; }
+.btn-primary:hover { background: #155a75; }
+.btn-secondary { background: var(--white); color: var(--gray-800); border-color: var(--gray-200); box-shadow: var(--shadow-sm); }
+.btn-secondary:hover { background: var(--gray-50); }
+.btn-ghost     { background: transparent; color: var(--gray-600); border-color: transparent; }
+.btn-ghost:hover { background: var(--gray-100); }
+.btn-danger    { background: var(--red-light); color: var(--red); border-color: #f5c0bb; }
+.btn-danger:hover { background: #fce8e6; }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.btn-lg { padding: 12px 24px; font-size: 14px; }
+.btn-icon { padding: 8px; gap: 0; }
+.btn-full { width: 100%; justify-content: center; }
+
+/* ─── CARDS ─── */
+.card {
+  background: var(--white); border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg); padding: 16px 20px;
+}
+.card-sm { padding: 12px 16px; border-radius: var(--radius); }
+.card-hover { cursor: pointer; transition: box-shadow 0.15s, border-color 0.15s; }
+.card-hover:hover { box-shadow: var(--shadow); border-color: var(--teal-mid); }
+.card-title {
+  font-size: 13px; font-weight: 500; color: var(--gray-800);
+  display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+}
+.card-title i { font-size: 16px; color: var(--teal); }
+
+/* ─── METRIC CARDS ─── */
+.metric { text-align: left; }
+.metric-label { font-size: 11px; color: var(--gray-400); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+.metric-value { font-size: 28px; font-weight: 600; color: var(--gray-800); line-height: 1.1; margin-top: 4px; }
+.metric-sub { font-size: 12px; color: var(--gray-400); margin-top: 4px; }
+
+/* ─── ALERTS ─── */
+.alert {
+  display: flex; gap: 10px; padding: 10px 14px;
+  border-radius: var(--radius-sm); font-size: 12px; line-height: 1.55;
+  border: 1px solid;
+}
+.alert i { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.alert-danger  { background: var(--red-light); border-color: #f5c0bb; color: #7a1f1a; }
+.alert-warning { background: var(--amber-light); border-color: #f5d89a; color: #7a4a00; }
+.alert-info    { background: var(--teal-light); border-color: var(--teal-mid); color: #0c3e52; }
+.alert-success { background: var(--green-light); border-color: #a8d8b8; color: #0c4a2a; }
+
+/* ─── FORMS ─── */
+.form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.form-label { font-size: 12px; font-weight: 500; color: var(--gray-600); }
+.form-label .req { color: var(--red); margin-left: 2px; }
+.form-control {
+  width: 100%; padding: 9px 12px; font-size: 13px; font-family: inherit;
+  background: var(--white); border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm); color: var(--gray-800);
+  transition: border-color 0.15s, box-shadow 0.15s; outline: none;
+}
+.form-control:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(26,107,138,0.12); }
+.form-control::placeholder { color: var(--gray-400); }
+select.form-control { cursor: pointer; }
+textarea.form-control { resize: vertical; min-height: 80px; line-height: 1.5; }
+
+/* ─── DROP ZONE ─── */
+.drop-zone {
+  border: 2px dashed var(--gray-200); border-radius: var(--radius);
+  padding: 28px 20px; text-align: center; cursor: pointer;
+  transition: all 0.2s; background: var(--gray-50);
+}
+.drop-zone:hover, .drop-zone.dragover {
+  border-color: var(--teal); background: var(--teal-light);
+}
+.drop-zone i { font-size: 32px; color: var(--gray-400); margin-bottom: 8px; }
+.drop-zone.dragover i { color: var(--teal); }
+.drop-zone p { font-size: 13px; color: var(--gray-600); }
+.drop-zone span { font-size: 11px; color: var(--gray-400); }
+
+/* ─── STEP INDICATOR ─── */
+.step-list { display: flex; flex-direction: column; gap: 8px; }
+.step-item {
+  display: flex; gap: 12px; padding: 12px 14px;
+  background: var(--gray-50); border: 1px solid var(--gray-200);
+  border-radius: var(--radius); align-items: flex-start;
+}
+.step-num {
+  width: 24px; height: 24px; border-radius: 50%; background: var(--teal);
+  color: #fff; font-size: 11px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.step-body { flex: 1; }
+.step-title { font-size: 13px; font-weight: 500; color: var(--gray-800); }
+.step-desc { font-size: 12px; color: var(--gray-600); margin-top: 4px; line-height: 1.55; }
+
+/* ─── TAGS ─── */
+.tag {
+  display: inline-block; font-size: 10px; font-weight: 500;
+  padding: 2px 7px; border-radius: 4px; margin-top: 6px;
+}
+.tag-critical { background: var(--red-light); color: #7a1f1a; }
+.tag-verify   { background: var(--teal-light); color: #0c3e52; }
+.tag-info     { background: var(--gold-light); color: #7a4a00; }
+
+/* ─── CHECKLIST ─── */
+.checklist { display: flex; flex-direction: column; gap: 6px; }
+.check-item {
+  display: flex; gap: 10px; padding: 10px 12px;
+  background: var(--gray-50); border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm); cursor: pointer; align-items: flex-start;
+  transition: border-color 0.15s;
+}
+.check-item:hover { border-color: var(--teal-mid); }
+.check-item.checked { background: var(--green-light); border-color: #a8d8b8; }
+.check-box {
+  width: 18px; height: 18px; border-radius: 4px; border: 2px solid var(--gray-200);
+  flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.check-item.checked .check-box { background: var(--green); border-color: var(--green); }
+.check-text { font-size: 13px; color: var(--gray-800); line-height: 1.4; }
+.check-item.checked .check-text { text-decoration: line-through; color: var(--gray-400); }
+.check-sub { font-size: 11px; color: var(--gray-400); margin-top: 2px; line-height: 1.4; }
+
+/* ─── TOGGLE SECTIONS ─── */
+.toggle-section { border: 1px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; margin-bottom: 8px; }
+.toggle-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; cursor: pointer; background: var(--gray-50);
+  font-size: 13px; font-weight: 500; transition: background 0.12s;
+  user-select: none;
+}
+.toggle-header:hover { background: var(--gray-100); }
+.toggle-body {
+  padding: 14px 16px; border-top: 1px solid var(--gray-200);
+  background: var(--white); font-size: 12px; color: var(--gray-600); line-height: 1.65;
+}
+.toggle-body table { width: 100%; border-collapse: collapse; }
+.toggle-body th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-400); padding: 4px 8px; border-bottom: 1px solid var(--gray-200); text-align: left; }
+.toggle-body td { padding: 7px 8px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+.toggle-body tr:last-child td { border-bottom: none; }
+.mono { font-family: 'Courier New', monospace; font-size: 11px; background: var(--gray-100); padding: 1px 5px; border-radius: 3px; color: var(--gray-600); }
+
+/* ─── CROIX PLANNING ─── */
+.planning-week { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
+.planning-day { text-align: center; }
+.planning-day-name { font-size: 10px; font-weight: 500; color: var(--gray-400); margin-bottom: 4px; }
+.planning-day-tag { font-size: 10px; font-weight: 500; padding: 3px 4px; border-radius: 4px; display: block; }
+
+/* ─── ANOMALIES TABLE ─── */
+.anomaly-table { width: 100%; border-collapse: collapse; }
+.anomaly-table th {
+  font-size: 11px; font-weight: 500; color: var(--gray-400);
+  text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 8px 12px; border-bottom: 1px solid var(--gray-200);
+  text-align: left;
+}
+.anomaly-table td { padding: 12px 12px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+.anomaly-table tr:last-child td { border-bottom: none; }
+.anomaly-table tr { cursor: pointer; transition: background 0.12s; }
+.anomaly-table tr:hover td { background: var(--gray-50); }
+.anomaly-row-title { font-size: 13px; font-weight: 500; color: var(--gray-800); }
+.anomaly-row-meta { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+
+/* ─── LAYOUT: LOGIN ─── */
+#page-login {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: var(--navy); padding: 24px;
+}
+.login-card {
+  background: var(--white); border-radius: 18px; padding: 40px 44px;
+  width: 100%; max-width: 420px; box-shadow: var(--shadow-lg);
+}
+.login-brand { margin-bottom: 32px; text-align: center; }
+.login-brand-name { font-size: 13px; font-weight: 600; color: var(--teal); letter-spacing: 0.08em; text-transform: uppercase; }
+.login-brand-sub { font-size: 22px; font-weight: 600; color: var(--gray-800); margin-top: 4px; }
+.login-brand-tagline { font-size: 12px; color: var(--gray-400); margin-top: 6px; }
+.login-divider { border: none; border-top: 1px solid var(--gray-100); margin: 20px 0; }
+.role-selector { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+.role-btn {
+  padding: 10px 8px; border-radius: var(--radius-sm); border: 1px solid var(--gray-200);
+  background: var(--white); cursor: pointer; text-align: center; transition: all 0.15s;
+  font-family: inherit;
+}
+.role-btn:hover { border-color: var(--teal); background: var(--teal-light); }
+.role-btn.active { border-color: var(--teal); background: var(--teal-light); }
+.role-btn i { display: block; font-size: 20px; color: var(--teal); margin-bottom: 4px; }
+.role-btn span { font-size: 11px; font-weight: 500; color: var(--gray-800); }
+.login-error { font-size: 12px; color: var(--red); margin-top: 8px; display: none; }
+
+/* ─── LAYOUT: APP ─── */
+#page-app { display: flex; height: 100vh; overflow: hidden; }
+
+.sidebar {
+  width: 220px; min-width: 220px; background: var(--navy);
+  display: flex; flex-direction: column; overflow: hidden;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.sidebar-brand {
+  padding: 20px 16px 14px; border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.sidebar-brand-name { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.4); letter-spacing: 0.12em; text-transform: uppercase; }
+.sidebar-brand-title { font-size: 14px; font-weight: 600; color: #fff; margin-top: 2px; }
+.sidebar-client-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 500; padding: 3px 8px;
+  border-radius: 20px; margin-top: 8px;
+  background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7);
+}
+
+.entity-switcher { padding: 10px 10px 6px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+.entity-label { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.1em; padding: 0 6px; margin-bottom: 5px; }
+.entity-pill {
+  display: flex; align-items: center; gap: 8px; padding: 6px 8px;
+  border-radius: var(--radius-sm); cursor: pointer; margin-bottom: 2px; transition: background 0.12s;
+}
+.entity-pill:hover { background: rgba(255,255,255,0.06); }
+.entity-pill.active { background: rgba(255,255,255,0.12); }
+.entity-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.entity-name { font-size: 12px; color: rgba(255,255,255,0.75); }
+.entity-code { font-size: 9px; color: rgba(255,255,255,0.3); margin-left: auto; }
+
+.nav-section { padding: 8px 10px; flex: 1; overflow-y: auto; }
+.nav-section-label { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.28); text-transform: uppercase; letter-spacing: 0.1em; padding: 10px 6px 4px; }
+.nav-item {
+  display: flex; align-items: center; gap: 8px; padding: 7px 8px;
+  border-radius: var(--radius-sm); cursor: pointer; margin-bottom: 1px; transition: background 0.12s;
+}
+.nav-item:hover { background: rgba(255,255,255,0.06); }
+.nav-item.active { background: rgba(255,255,255,0.13); }
+.nav-item i { font-size: 16px; color: rgba(255,255,255,0.4); width: 18px; text-align: center; flex-shrink: 0; }
+.nav-item.active i { color: var(--gold); }
+.nav-item-label { font-size: 12px; color: rgba(255,255,255,0.65); }
+.nav-item.active .nav-item-label { color: #fff; font-weight: 500; }
+.nav-badge { margin-left: auto; font-size: 9px; background: var(--red); color: #fff; padding: 1px 6px; border-radius: 10px; font-weight: 600; }
+
+.sidebar-footer {
+  padding: 12px 14px; border-top: 1px solid rgba(255,255,255,0.07);
+}
+.sidebar-user { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.sidebar-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.8);
+}
+.sidebar-user-name { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.75); }
+.sidebar-user-role { font-size: 10px; color: rgba(255,255,255,0.35); }
+
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.topbar {
+  padding: 0 24px; height: 52px; display: flex; align-items: center; justify-content: space-between;
+  background: var(--white); border-bottom: 1px solid var(--gray-200); flex-shrink: 0;
+}
+.topbar-title { font-size: 15px; font-weight: 600; color: var(--gray-800); }
+.topbar-actions { display: flex; gap: 8px; align-items: center; }
+
+.content { flex: 1; overflow-y: auto; padding: 24px; }
+.content-header { margin-bottom: 20px; }
+.content-header h1 { font-size: 20px; font-weight: 600; color: var(--gray-800); }
+.content-header p { font-size: 13px; color: var(--gray-400); margin-top: 4px; }
+
+/* ─── ANOMALIE DETAIL ─── */
+.anomalie-timeline { display: flex; flex-direction: column; gap: 0; margin-top: 16px; }
+.timeline-item { display: flex; gap: 14px; padding-bottom: 20px; position: relative; }
+.timeline-item::before { content: ''; position: absolute; left: 15px; top: 32px; bottom: 0; width: 1px; background: var(--gray-200); }
+.timeline-item:last-child::before { display: none; }
+.timeline-icon {
+  width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 14px;
+  border: 2px solid var(--white); z-index: 1;
+}
+.timeline-icon.teal { background: var(--teal-light); color: var(--teal); }
+.timeline-icon.gold { background: var(--gold-light); color: var(--amber); }
+.timeline-icon.green { background: var(--green-light); color: var(--green); }
+.timeline-body { flex: 1; padding-top: 4px; }
+.timeline-title { font-size: 13px; font-weight: 500; color: var(--gray-800); }
+.timeline-meta { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+.timeline-content { font-size: 12px; color: var(--gray-600); margin-top: 6px; line-height: 1.55; }
+
+/* ─── PDF FILE ITEM ─── */
+.file-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+  background: var(--gray-50); border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+}
+.file-icon { font-size: 20px; color: var(--red); flex-shrink: 0; }
+.file-name { font-size: 13px; font-weight: 500; color: var(--gray-800); flex: 1; }
+.file-size { font-size: 11px; color: var(--gray-400); }
+
+/* ─── SECTION DIVIDER ─── */
+.section-label {
+  font-size: 11px; font-weight: 600; color: var(--gray-400);
+  text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--gray-200); }
+hr.divider { border: none; border-top: 1px solid var(--gray-100); margin: 20px 0; }
+
+/* ─── NOTIFICATION TOAST ─── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 18px; background: var(--gray-800); color: #fff;
+  border-radius: var(--radius); box-shadow: var(--shadow-lg);
+  font-size: 13px; font-weight: 500; transform: translateY(80px); opacity: 0;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast i { font-size: 16px; color: #6ee7b7; }
+
+/* ─── CROIX CODE COLORS ─── */
+.croix-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.croix-item { display: flex; gap: 10px; padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--gray-200); background: var(--gray-50); }
+.croix-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; margin-top: 2px; }
+.croix-label { font-size: 12px; font-weight: 500; color: var(--gray-800); }
+.croix-desc { font-size: 11px; color: var(--gray-400); margin-top: 2px; line-height: 1.4; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 768px) {
+  .sidebar { width: 60px; min-width: 60px; }
+  .sidebar-brand-title, .entity-name, .entity-code, .nav-item-label, .nav-section-label, .entity-label, .sidebar-user-name, .sidebar-user-role, .sidebar-brand-name { display: none; }
+  .entity-dot { margin: 0 auto; }
+  .nav-item { justify-content: center; padding: 10px 0; }
+  .nav-item i { width: auto; }
+  .content { padding: 16px; }
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ PAGE LOGIN ═══ -->
+<div id="page-login">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="login-brand-name">ChronoDesk™</div>
+      <div class="login-brand-sub">Portail facturation ambulances</div>
+      <div class="login-brand-tagline">Votre espace sécurisé de gestion et de ressources</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Société</label>
+      <select class="form-control" id="login-client">
+        <option value="">Sélectionner une société...</option>
+        <option value="anjaly">Groupe ANJALY</option>
+        <option value="future">— Futur client —</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Rôle</label>
+      <div class="role-selector">
+        <button class="role-btn" data-role="direction" onclick="selectRole(this)">
+          <i class="ti ti-chart-bar"></i>
+          <span>Direction</span>
+        </button>
+        <button class="role-btn" data-role="collaboratrice" onclick="selectRole(this)">
+          <i class="ti ti-user-check"></i>
+          <span>Collaboratrice</span>
+        </button>
+        <button class="role-btn" data-role="client" onclick="selectRole(this)">
+          <i class="ti ti-building-hospital"></i>
+          <span>Client</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Mot de passe</label>
+      <input class="form-control" type="password" id="login-pwd" placeholder="Votre mot de passe d'accès" onkeydown="if(event.key==='Enter')doLogin()">
+      <div class="login-error" id="login-error">Mot de passe incorrect. Contactez ChronoDesk.</div>
+    </div>
+
+    <button class="btn btn-primary btn-full btn-lg" onclick="doLogin()">
+      <i class="ti ti-lock-open"></i> Accéder à l'espace
+    </button>
+
+    <hr class="login-divider">
+    <p style="font-size:11px;color:var(--gray-400);text-align:center">
+      Problème d'accès ? <a href="mailto:contact@chrono-desk.fr" style="color:var(--teal)">Contacter ChronoDesk™</a>
+    </p>
+  </div>
+</div>
+
+<!-- ═══ PAGE APP ═══ -->
+<div id="page-app" class="hidden">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-name">ChronoDesk™</div>
+      <div class="sidebar-brand-title">Ambulances</div>
+      <div class="sidebar-client-badge">
+        <i class="ti ti-building-hospital" style="font-size:11px"></i>
+        <span id="sidebar-client-name">Groupe ANJALY</span>
+      </div>
+    </div>
+
+    <div class="entity-switcher" id="entity-switcher">
+      <div class="entity-label">Sociétés</div>
+      <div class="entity-pill active" onclick="setEntity('am',this)">
+        <span class="entity-dot" style="background:#1a6b8a"></span>
+        <span class="entity-name">Amb. ANJALY</span>
+        <span class="entity-code">AM</span>
+      </div>
+      <div class="entity-pill" onclick="setEntity('acb',this)">
+        <span class="entity-dot" style="background:#f0a500"></span>
+        <span class="entity-name">ANJALY Chant.</span>
+        <span class="entity-code">ACB</span>
+      </div>
+      <div class="entity-pill" onclick="setEntity('cbe',this)">
+        <span class="entity-dot" style="background:#1a7a4a"></span>
+        <span class="entity-name">CBE</span>
+        <span class="entity-code">CBE</span>
+      </div>
+    </div>
+
+    <nav class="nav-section">
+      <div class="nav-section-label">Navigation</div>
+      <div class="nav-item active" onclick="showPage('dashboard')" data-page="dashboard">
+        <i class="ti ti-layout-dashboard"></i>
+        <span class="nav-item-label">Tableau de bord</span>
+      </div>
+      <div class="nav-item" onclick="showPage('ressources')" data-page="ressources">
+        <i class="ti ti-book-2"></i>
+        <span class="nav-item-label">Ressources</span>
+      </div>
+      <div class="nav-item" onclick="showPage('anomalies')" data-page="anomalies">
+        <i class="ti ti-alert-triangle"></i>
+        <span class="nav-item-label">Anomalies</span>
+        <span class="nav-badge" id="badge-anomalies">2</span>
+      </div>
+      <div class="nav-item" onclick="showPage('fdr')" data-page="fdr">
+        <i class="ti ti-folders"></i>
+        <span class="nav-item-label">FDR · Drive</span>
+      </div>
+      <div class="nav-section-label">Ressources métier</div>
+      <div class="nav-item" onclick="showPage('samu')" data-page="samu">
+        <i class="ti ti-ambulance"></i>
+        <span class="nav-item-label">Saisie SAMU</span>
+      </div>
+      <div class="nav-item" onclick="showPage('regulation')" data-page="regulation">
+        <i class="ti ti-route"></i>
+        <span class="nav-item-label">Régulation</span>
+      </div>
+      <div class="nav-item" onclick="showPage('mutuelles')" data-page="mutuelles">
+        <i class="ti ti-key"></i>
+        <span class="nav-item-label">Accès mutuelles</span>
+      </div>
+      <div class="nav-item" onclick="showPage('cas')" data-page="cas">
+        <i class="ti ti-file-description"></i>
+        <span class="nav-item-label">Cas particuliers</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user" onclick="doLogout()">
+        <div class="sidebar-avatar" id="sidebar-avatar">J</div>
+        <div>
+          <div class="sidebar-user-name" id="sidebar-user-name">Jessica S.</div>
+          <div class="sidebar-user-role" id="sidebar-user-role">Direction</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Tableau de bord</div>
+      <div class="topbar-actions">
+        <a href="https://scrurgences.fr/SCRAmbulance" target="_blank" class="btn btn-secondary btn-sm">
+          <i class="ti ti-external-link"></i> SCR Urgences
+        </a>
+        <a href="https://sirusidf.lomaco.info/SirusWeb-idf" target="_blank" class="btn btn-secondary btn-sm">
+          <i class="ti ti-external-link"></i> LOMACO
+        </a>
+        <button class="btn btn-primary btn-sm" onclick="showPage('anomalies-new')">
+          <i class="ti ti-plus"></i> Nouvelle anomalie
+        </button>
+      </div>
+    </div>
+    <div class="content" id="main-content"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <i class="ti ti-check"></i>
+  <span id="toast-msg">Action effectuée</span>
+</div>
+
+<script>
+/* ═══════════════════════════════
+   STATE
+═══════════════════════════════ */
+const PASSWORDS = {
+  direction: 'chrono-direction-2025',
+  collaboratrice: 'chrono-collab-2025',
+  client: 'anjaly-2025'
+};
+const ROLE_LABELS = {
+  direction: 'Direction', collaboratrice: 'Collaboratrice', client: 'Client'
+};
+const ENTITIES = {
+  am:  { label: 'Ambulances ANJALY', code: 'AM',  color: '#1a6b8a', vehicule: '455 (SAMU exclusif)' },
+  acb: { label: 'ANJALY Chanteloup', code: 'ACB', color: '#f0a500', vehicule: '589' },
+  cbe: { label: 'CBE',               code: 'CBE', color: '#1a7a4a', vehicule: '—' }
+};
+
+let state = {
+  role: '',
+  entity: 'am',
+  checks: {},
+  anomalies: [
+    { id: 1, title: 'SAMU 25051193 — commune à vérifier', type: 'facturation', priority: 'urgent', status: 'open', date: '18/07/2026', entity: 'am', author: 'Jessica S.', desc: 'Vérifier concordance commune sur dossier Varrèdes. Dépôt en attente. Contacter la régulation si besoin.', files: ['SAMU_25051193_FDR.pdf'], correction: null },
+    { id: 2, title: 'Mutuelles — Harmonie & Carte Blanche KO', type: 'mutuelle', priority: 'normal', status: 'progress', date: '17/07/2026', entity: 'am', author: 'Jessica S.', desc: 'Mots de passe ne fonctionnent plus sur les deux mutuelles. Attente mail de réinitialisation. Ne pas télétransmettre en attendant.', files: [], correction: null }
+  ],
+  nextId: 3,
+  currentPage: 'dashboard',
+  currentAnomalie: null,
+  newAnomalieFiles: [],
+  toggles: {}
+};
+
+/* ═══════════════════════════════
+   LOGIN
+═══════════════════════════════ */
+function selectRole(btn) {
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.role = btn.dataset.role;
+}
+
+function doLogin() {
+  const client = document.getElementById('login-client').value;
+  const pwd = document.getElementById('login-pwd').value;
+  const err = document.getElementById('login-error');
+  if (!state.role || !PASSWORDS[state.role]) { err.style.display = 'block'; err.textContent = 'Veuillez sélectionner un rôle.'; return; }
+  if (!client) { err.style.display = 'block'; err.textContent = 'Veuillez sélectionner une société.'; return; }
+  if (pwd !== PASSWORDS[state.role]) { err.style.display = 'block'; err.textContent = 'Mot de passe incorrect. Contactez ChronoDesk.'; return; }
+  err.style.display = 'none';
+  const initials = state.role === 'direction' ? 'JS' : state.role === 'collaboratrice' ? 'Co' : 'AN';
+  const name = state.role === 'direction' ? 'Jessica S.' : state.role === 'collaboratrice' ? 'Collaboratrice' : 'ANJALY DG';
+  document.getElementById('sidebar-avatar').textContent = initials;
+  document.getElementById('sidebar-user-name').textContent = name;
+  document.getElementById('sidebar-user-role').textContent = ROLE_LABELS[state.role];
+  if (state.role === 'client') {
+    document.getElementById('entity-switcher').style.display = 'none';
+  }
+  document.getElementById('page-login').classList.add('hidden');
+  document.getElementById('page-app').classList.remove('hidden');
+  showPage('dashboard');
+}
+
+function doLogout() {
+  document.getElementById('page-app').classList.add('hidden');
+  document.getElementById('page-login').classList.remove('hidden');
+  state.role = '';
+  document.getElementById('login-pwd').value = '';
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+}
+
+/* ═══════════════════════════════
+   NAVIGATION
+═══════════════════════════════ */
+const PAGE_TITLES = {
+  dashboard: 'Tableau de bord', ressources: 'Ressources & protocoles',
+  anomalies: 'Anomalies', 'anomalies-new': 'Nouvelle anomalie',
+  'anomalie-detail': 'Détail de l\'anomalie', fdr: 'Feuilles de route · Google Drive',
+  samu: 'Guide saisie SAMU', regulation: 'Guide régulation',
+  mutuelles: 'Accès mutuelles', cas: 'Cas particuliers'
+};
+
+function showPage(page) {
+  state.currentPage = page;
+  document.getElementById('topbar-title').textContent = PAGE_TITLES[page] || page;
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.page === page);
+  });
+  const c = document.getElementById('main-content');
+  const renders = {
+    dashboard: renderDashboard, ressources: renderRessources,
+    anomalies: renderAnomalies, 'anomalies-new': renderAnomaliesNew,
+    'anomalie-detail': renderAnomalieDetail, fdr: renderFDR,
+    samu: renderSamu, regulation: renderRegulation,
+    mutuelles: renderMutuelles, cas: renderCas
+  };
+  c.innerHTML = (renders[page] || (() => '<p>Page à venir</p>'))();
+  c.scrollTop = 0;
+  bindToggles(); bindChecks(); bindDrop();
+}
+
+function setEntity(e, el) {
+  state.entity = e;
+  document.querySelectorAll('.entity-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  showPage(state.currentPage);
+}
+
+/* ═══════════════════════════════
+   TOAST
+═══════════════════════════════ */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ═══════════════════════════════
+   TOGGLE SECTIONS
+═══════════════════════════════ */
+function bindToggles() {
+  document.querySelectorAll('.toggle-header').forEach(h => {
+    const id = h.dataset.toggle;
+    const body = document.getElementById('tbody-' + id);
+    const icon = document.getElementById('ticon-' + id);
+    if (!body) return;
+    if (state.toggles[id]) { body.style.display = 'block'; if (icon) icon.className = 'ti ti-chevron-up'; }
+    h.addEventListener('click', () => {
+      const open = body.style.display === 'block';
+      body.style.display = open ? 'none' : 'block';
+      if (icon) icon.className = open ? 'ti ti-chevron-down' : 'ti ti-chevron-up';
+      state.toggles[id] = !open;
+    });
+  });
+}
+
+function toggleSection(id) {
+  const body = document.getElementById('tbody-' + id);
+  const icon = document.getElementById('ticon-' + id);
+  if (!body) return;
+  const open = body.style.display === 'block';
+  body.style.display = open ? 'none' : 'block';
+  if (icon) icon.className = open ? 'ti ti-chevron-down' : 'ti ti-chevron-up';
+  state.toggles[id] = !open;
+}
+
+/* ═══════════════════════════════
+   CHECKLIST
+═══════════════════════════════ */
+function bindChecks() {
+  document.querySelectorAll('[data-check]').forEach(el => {
+    const id = el.dataset.check;
+    if (state.checks[id]) el.classList.add('checked');
+    el.addEventListener('click', () => {
+      state.checks[id] = !state.checks[id];
+      el.classList.toggle('checked', state.checks[id]);
+      const icon = el.querySelector('.check-box');
+      icon.innerHTML = state.checks[id] ? '<i class="ti ti-check" style="font-size:11px;color:#fff"></i>' : '';
+      const txt = el.querySelector('.check-text');
+      txt.classList.toggle('done', state.checks[id]);
+    });
+    const icon = el.querySelector('.check-box');
+    if (state.checks[id]) icon.innerHTML = '<i class="ti ti-check" style="font-size:11px;color:#fff"></i>';
+  });
+}
+
+/* ═══════════════════════════════
+   DROP ZONE
+═══════════════════════════════ */
+function bindDrop() {
+  const dz = document.getElementById('drop-zone');
+  if (!dz) return;
+  const fi = document.getElementById('file-input');
+  dz.addEventListener('click', () => fi.click());
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+  dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+  fi.addEventListener('change', () => handleFiles(fi.files));
+}
+
+function handleFiles(files) {
+  Array.from(files).forEach(f => {
+    if (!state.newAnomalieFiles.find(x => x.name === f.name)) state.newAnomalieFiles.push(f);
+  });
+  renderFileList();
+}
+
+function renderFileList() {
+  const fl = document.getElementById('file-list');
+  if (!fl) return;
+  fl.innerHTML = state.newAnomalieFiles.map((f,i) => `
+    <div class="file-item mt-8">
+      <i class="ti ti-file-type-pdf file-icon"></i>
+      <span class="file-name">${f.name}</span>
+      <span class="file-size">${(f.size/1024).toFixed(0)} ko</span>
+      <button class="btn btn-ghost btn-icon btn-sm" onclick="removeFile(${i})" title="Supprimer"><i class="ti ti-x"></i></button>
+    </div>`).join('');
+}
+
+function removeFile(i) { state.newAnomalieFiles.splice(i,1); renderFileList(); }
+
+/* ═══════════════════════════════
+   ANOMALIES
+═══════════════════════════════ */
+function submitAnomalie() {
+  const title = document.getElementById('an-title').value.trim();
+  const type = document.getElementById('an-type').value;
+  const priority = document.getElementById('an-priority').value;
+  const desc = document.getElementById('an-desc').value.trim();
+  if (!title || !desc) { showToast('Merci de remplir le titre et la description.'); return; }
+  const newA = {
+    id: state.nextId++, title, type, priority, status: 'open',
+    date: new Date().toLocaleDateString('fr-FR'),
+    entity: state.entity,
+    author: state.role === 'direction' ? 'Jessica S.' : 'Collaboratrice',
+    desc,
+    files: state.newAnomalieFiles.map(f => f.name),
+    correction: null
+  };
+  state.anomalies.unshift(newA);
+  state.newAnomalieFiles = [];
+  updateBadge();
+  showToast('Anomalie créée. Notification envoyée au client.');
+  showPage('anomalies');
+}
+
+function openAnomalie(id) {
+  state.currentAnomalie = id;
+  showPage('anomalie-detail');
+}
+
+function updateStatus(id, s) {
+  const a = state.anomalies.find(x => x.id === id);
+  if (a) { a.status = s; updateBadge(); showPage('anomalie-detail'); showToast('Statut mis à jour.'); }
+}
+
+function updateBadge() {
+  const open = state.anomalies.filter(a => a.status === 'open').length;
+  const b = document.getElementById('badge-anomalies');
+  if (b) { b.textContent = open; b.style.display = open ? 'inline-block' : 'none'; }
+}
+
+/* ═══════════════════════════════
+   RENDER HELPERS
+═══════════════════════════════ */
+function priorityBadge(p) {
+  if (p === 'urgent') return '<span class="badge badge-red">Urgent</span>';
+  if (p === 'normal') return '<span class="badge badge-teal">Normal</span>';
+  return '<span class="badge badge-gray">Info</span>';
+}
+
+function statusBadge(s) {
+  if (s === 'open')     return '<span class="badge badge-red"><span class="status-dot dot-open"></span>Ouvert</span>';
+  if (s === 'progress') return '<span class="badge badge-gold"><span class="status-dot dot-progress"></span>En cours</span>';
+  return '<span class="badge badge-green"><span class="status-dot dot-done"></span>Résolu</span>';
+}
+
+function entityBadge(code) {
+  const colors = { AM: 'badge-teal', ACB: 'badge-gold', CBE: 'badge-green' };
+  return `<span class="badge ${colors[code] || 'badge-gray'}">${code}</span>`;
+}
+
+/* ═══════════════════════════════
+   PAGES
+═══════════════════════════════ */
+function renderDashboard() {
+  const e = ENTITIES[state.entity];
+  const openCount = state.anomalies.filter(a => a.status === 'open').length;
+  return `
+<div class="content-header">
+  <h1>Bonjour — ${e.label}</h1>
+  <p>Véhicule : <strong>${e.vehicule}</strong> · Secteur Meaux · SCR : ambulances.mas@hotmail.fr</p>
+</div>
+
+<div class="alert alert-danger mb-16" style="margin-bottom:16px">
+  <i class="ti ti-alert-octagon"></i>
+  <div><strong>Véhicule 455 — SAMU exclusif.</strong> Code toujours en Garde (AIG). Interdit de saisir autre chose que du SAMU avec ce véhicule.</div>
+</div>
+
+<div class="grid-4 mb-16" style="margin-bottom:16px">
+  <div class="card metric">
+    <div class="metric-label">Anomalies ouvertes</div>
+    <div class="metric-value" style="color:var(--red)">${openCount}</div>
+    <div class="metric-sub">Nécessitent une action</div>
+  </div>
+  <div class="card metric">
+    <div class="metric-label">Société active</div>
+    <div class="metric-value" style="font-size:18px;margin-top:8px">${e.code}</div>
+    <div class="metric-sub">${e.label}</div>
+  </div>
+  <div class="card metric">
+    <div class="metric-label">Télétransmission</div>
+    <div class="metric-value" style="font-size:16px;color:var(--amber);margin-top:8px">B2</div>
+    <div class="metric-sub">Attente vérif. RMG</div>
+  </div>
+  <div class="card metric">
+    <div class="metric-label">Planning garde</div>
+    <div class="metric-value" style="font-size:16px;margin-top:8px">Meaux</div>
+    <div class="metric-sub">Vérifier SCR chaque jour</div>
+  </div>
+</div>
+
+<div class="section-label">Planning de garde — Équipe JOUR (AM)</div>
+<div class="planning-week mb-16" style="margin-bottom:16px">
+  ${[['Lun','am','#e8f4f8','#0c3e52'],['Mar','—','#f0eeeb','#9c9890'],['Mer','—','#f0eeeb','#9c9890'],['Jeu','—','#f0eeeb','#9c9890'],['Ven','am','#e8f4f8','#0c3e52'],['Sam','acb*','#fff8e6','#7a4a00'],['Dim','am','#e8f4f8','#0c3e52']].map(([d,t,bg,fg])=>`
+  <div class="planning-day">
+    <div class="planning-day-name">${d}</div>
+    <span class="planning-day-tag" style="background:${bg};color:${fg}">${t.toUpperCase()}</span>
+  </div>`).join('')}
+</div>
+<p class="text-sm text-muted mb-16" style="margin-bottom:16px">* Toujours vérifier sur SCR → Gardes → Planning des gardes → Secteur Meaux</p>
+
+<div class="section-label">Accès rapides</div>
+<div class="grid-2">
+  <div class="card card-hover" onclick="showPage('samu')">
+    <div class="card-title"><i class="ti ti-ambulance"></i>Guide saisie SAMU</div>
+    <p class="text-sm text-muted">7 étapes · Codes UPH · N° dossier CENTAURE</p>
+  </div>
+  <div class="card card-hover" onclick="showPage('anomalies-new')">
+    <div class="card-title"><i class="ti ti-alert-triangle"></i>Ouvrir une anomalie</div>
+    <p class="text-sm text-muted">Dépôt PDF · Notification client automatique</p>
+  </div>
+  <div class="card card-hover" onclick="showPage('mutuelles')">
+    <div class="card-title"><i class="ti ti-key"></i>Accès mutuelles</div>
+    <p class="text-sm text-muted">MGEN · VIAMEDIS · ALMERYS · ISANTE…</p>
+  </div>
+  <div class="card card-hover" onclick="showPage('fdr')">
+    <div class="card-title"><i class="ti ti-folders"></i>Feuilles de route</div>
+    <p class="text-sm text-muted">Google Drive · FDR scannées par société</p>
+  </div>
+</div>`;
+}
+
+function renderSamu() {
+  return `
+<div class="content-header">
+  <h1>Guide saisie SAMU</h1>
+  <p>Procédure complète de vérification et saisie des transports SAMU</p>
+</div>
+
+<div class="alert alert-danger mb-16" style="margin-bottom:16px">
+  <i class="ti ti-alert-octagon"></i>
+  <div><strong>Règles critiques :</strong> SAMU annulé avant contact patient = pas de saisie. Non-assuré social = sortie blanche. Véhicule 455 → code toujours AIG.</div>
+</div>
+
+<div class="section-label">Étapes de saisie</div>
+<div class="step-list mb-16" style="margin-bottom:16px">
+  ${[
+    ['Vérifier la garde sur SCR','SCR → Gardes → Planning des gardes → Secteur <strong>Meaux</strong>. Identifier quelle société est de garde (AM / ACB / CBE) avant toute action.','critical'],
+    ['Historique des appels SCR','Mon compte → Historique des appels → modifier la date → Chercher → Entonnoir → taper <code>anjaly</code> → Entrée. Vérifier commune + n° dossier. Attention : ville du domicile ≠ commune d\'intervention.','verify'],
+    ['Nouvelle prestation en régulation','Cliquer « Nouvelle prestation » → choisir la date du transport. Type : <strong>Allongé</strong>. Agence : <strong>AMBULANCE ANJALY</strong>. Prescripteur alias = <strong>SAMU</strong>.','info'],
+    ['Renseigner les 4 champs de la fiche SAMU','<strong>1</strong> Heure de départ · <strong>2</strong> Prise en charge · <strong>3</strong> Arrivée CH (à vérifier avec le BS) · <strong>4</strong> Arrivée CH. L\'heure départ mission ≠ heure PEC patient.','critical'],
+    ['Code UPH à appliquer','UPH <strong>AHG</strong> = Hors Garde · <strong>AIG</strong> = En Garde · <strong>ASBAHG</strong> = pas transporté HG · <strong>ASBAIG</strong> = pas transporté EG. Véhicule 455 → toujours <strong>AIG</strong>.','critical'],
+    ['Obtenir le N° SAMU si manquant','LOMACO → sirusidf.lomaco.info/SirusWeb-idf · Login : <code>amb.13eme</code> · MDP : <code>Jeteveux2025+</code> → Bonhomme haut gauche → Code activation mail → Liste permanences → Sélectionner date.','verify'],
+    ['Valider et mettre en prestation','Factures en <strong>B2</strong>. Ne pas télétransmettre avant vérification RMG fin de mois.','info']
+  ].map(([title,desc,type],i) => `
+  <div class="step-item">
+    <div class="step-num">${i+1}</div>
+    <div class="step-body">
+      <div class="step-title">${title}</div>
+      <div class="step-desc">${desc}</div>
+      <span class="tag tag-${type === 'critical' ? 'critical' : type === 'verify' ? 'verify' : 'info'}">${type === 'critical' ? 'Critique' : type === 'verify' ? 'À vérifier' : 'Information'}</span>
+    </div>
+  </div>`).join('')}
+</div>
+
+<div class="section-label">Code couleur des croix (régulation)</div>
+<div class="croix-grid">
+  <div class="croix-item"><div class="croix-dot" style="background:#3b82f6"></div><div><div class="croix-label">Croix bleue</div><div class="croix-desc">Course sous-traitée → déduire de la PMT. Signaler direction pour process.</div></div></div>
+  <div class="croix-item"><div class="croix-dot" style="background:#9ca3af"></div><div><div class="croix-label">Croix grise</div><div class="croix-desc">Transport VSL → non certifiable.</div></div></div>
+  <div class="croix-item"><div class="croix-dot" style="background:#ef4444"></div><div><div class="croix-label">Croix rouge</div><div class="croix-desc">Attente à ajouter (direction uniquement).</div></div></div>
+  <div class="croix-item"><div class="croix-dot" style="background:#22c55e"></div><div><div class="croix-label">Croix verte</div><div class="croix-desc">Ne pas certifier ce transport.</div></div></div>
+</div>`;
+}
+
+function renderRegulation() {
+  return `
+<div class="content-header">
+  <h1>Guide régulation</h1>
+  <p>Saisie et concordance des courses · Clinique du Sport</p>
+</div>
+
+<div class="alert alert-info mb-16" style="margin-bottom:16px">
+  <i class="ti ti-info-circle"></i>
+  <div>La saisie doit impérativement se faire via la <strong>Régulation</strong>. L'heure de départ mission est différente de l'heure PEC patient. Sur la facture = heure départ avec patient. Sur le fichier RMG = heure de départ mission.</div>
+</div>
+
+<div class="section-label">Processus saisie régulation</div>
+<div class="step-list mb-16" style="margin-bottom:16px">
+  ${[
+    ['Ouvrir la régulation','Agence : AMBULANCE ANJALY. Type de prestation : Facture libre / Allongé. Origine trajet aller.'],
+    ['Patient et partenaires payeurs','Patient → rechercher ou créer. Caisse : de l\'assuré. Payeur si sortie blanche = ASB, sinon caisse de rattachement.'],
+    ['Nature du transport','Hospitalisation / Transfert / Urgence / Longue distance / Itératifs / Accident / ATMP. Dans nature : choisir SAMU + n° de SAMU.'],
+    ['Renseigner départ et arrivée','Début 1 → PEC 2 → Arrivée 3 → Fin 4. Adresse PEC / lieu de dépose. Véhicule + chauffeur + équipe.'],
+    ['Valider pour mise en prestation','Valider la course pour qu\'elle passe en prestation. Vérifier le statut dans la liste.']
+  ].map(([t,d],i) => `
+  <div class="step-item">
+    <div class="step-num">${i+1}</div>
+    <div class="step-body"><div class="step-title">${t}</div><div class="step-desc">${d}</div></div>
+  </div>`).join('')}
+</div>
+
+<div class="section-label">Concordance FDR / SCR</div>
+<div class="checklist">
+  ${[
+    ['c-scr','Connexion SCR effectuée','scrurgences.fr/SCRAmbulance · ambulances.mas@hotmail.fr'],
+    ['c-garde','Société de garde identifiée sur planning','Gardes → Planning des gardes → Secteur Meaux'],
+    ['c-hist','Historique appels SCR filtré sur la période','Mon compte → Historique → Date → anjaly'],
+    ['c-commune','Concordance commune vérifiée','Ville domicile patient ≠ commune d\'intervention possible'],
+    ['c-nums','N° SAMU concordants avec les FDR','N° dossier SCR = n° sur feuille de route'],
+    ['c-courses','Toutes les courses SCR présentes sur FDR','Si absent → contacter la direction'],
+    ['c-b2','Factures en B2 · pas de télétransmission','Attendre vérification RMG fin de mois']
+  ].map(([id,label,sub]) => `
+  <div class="check-item" data-check="${id}">
+    <div class="check-box"></div>
+    <div><div class="check-text">${label}</div><div class="check-sub">${sub}</div></div>
+  </div>`).join('')}
+</div>
+<br>
+<button class="btn btn-secondary btn-sm" onclick="Object.keys(state.checks).forEach(k=>state.checks[k]=false);showPage('regulation')">
+  <i class="ti ti-refresh"></i> Réinitialiser la checklist
+</button>
+
+<hr class="divider">
+<div class="section-label">Clinique du Sport — saisie facture libre</div>
+<div class="alert alert-warning">
+  <i class="ti ti-clock"></i>
+  <div>Les notifications arrivent dans les 24–48h après le transport. C'est à ce moment qu'on peut ajouter attente ou péage. Factures éditées à la quinzaine. Si un transport est validé sur la plateforme mais pas barré sur les FDR → vérifier en régulation + signaler non-conformité si absent.</div>
+</div>`;
+}
+
+function renderMutuelles() {
+  const sections = [
+    { id:'mgen', label:'MGEN', rows:[
+      ['AM','772580361','UAUAYU04','2 ans et 1 mois date de facture'],
+      ['ACB','772500690','3IIYAIU4',''],['CBE','772522934','YAU7UEY0','']
+    ]},
+    { id:'viamedis', label:'VIAMEDIS', rows:[
+      ['AM','772580361','Bajande123!!',''],['ACB','772500690','Bajande123!!',''],['CBE','772522934','Bajande123!!','']
+    ]},
+    { id:'almerys', label:'ALMERYS — Admin', rows:[
+      ['AM','ce734291aa','Platanes789!?',''],['ACB','ce1910925k8q','Platanes789!?',''],['CBE','ce2268763vq8','Platanes789!?','']
+    ]},
+    { id:'almerys2', label:'ALMERYS — Direction', rows:[
+      ['AM','direction','Platanes852!?',''],['ACB','directionacb','Platanes789!?',''],['CBE','directioncbe','Platanes789!?','']
+    ]},
+    { id:'isante', label:'ISANTE / SPSANTE / KORELIO', rows:[
+      ['AM','772580361','Saintfiacre501!!','ISANTE + SPSANTE'],['AM','772580361','saintfiacre501','KORELIO'],
+      ['ACB','772500690','Saintfiacre501!!','ISANTE + SPSANTE'],['CBE','772522934','Saintfiacre501!!','ISANTE + SPSANTE']
+    ]}
+  ];
+  return `
+<div class="content-header">
+  <h1>Accès mutuelles</h1>
+  <p>Credentials par société (AM · ACB · CBE)</p>
+</div>
+
+<div class="alert alert-warning mb-16" style="margin-bottom:16px">
+  <i class="ti ti-alert-triangle"></i>
+  <div><strong>Harmonie Mutuelle & Carte Blanche</strong> — Mots de passe KO. Mail de réinitialisation non reçu. Ne pas télétransmettre ces mutuelles.</div>
+</div>
+
+${sections.map(s => `
+<div class="toggle-section">
+  <div class="toggle-header" data-toggle="${s.id}">
+    <span><i class="ti ti-building-bank" style="margin-right:8px;color:var(--teal)"></i>${s.label}</span>
+    <i class="ti ti-chevron-down" id="ticon-${s.id}"></i>
+  </div>
+  <div class="toggle-body" id="tbody-${s.id}" style="display:none">
+    <table>
+      <tr><th>Société</th><th>Identifiant</th><th>Mot de passe</th><th>Note</th></tr>
+      ${s.rows.map(([soc,id,pwd,note]) => `
+      <tr>
+        <td><span class="badge ${soc==='AM'?'badge-teal':soc==='ACB'?'badge-gold':'badge-green'}">${soc}</span></td>
+        <td><span class="mono">${id}</span></td>
+        <td><span class="mono">${pwd}</span></td>
+        <td style="color:var(--gray-400);font-size:11px">${note}</td>
+      </tr>`).join('')}
+    </table>
+  </div>
+</div>`).join('')}
+
+<hr class="divider">
+<div class="section-label">Boîte mail mutuelles patients</div>
+<div class="card card-sm">
+  <div style="font-size:13px;line-height:1.8;color:var(--gray-600)">
+    Les salariés envoient les mutuelles à :<br>
+    <span class="mono">anjaly.mutuelle2@gmail.com</span> · MDP : <span class="mono">anjalY0707!?</span><br>
+    EXDAT : identifiant <span class="mono">MASS11</span> · MDP : <span class="mono">Anjaly2026</span>
+  </div>
+</div>`;
+}
+
+function renderCas() {
+  return `
+<div class="content-header">
+  <h1>Cas particuliers</h1>
+  <p>Sorties blanches · Patients récurrents · LOMACO · Contacts</p>
+</div>
+
+${[
+  { id:'blanche', icon:'ti-circle', label:'Sortie blanche', content:`
+    <strong>Non-assuré social → Sortie blanche.</strong> Annulé avant contact patient → pas de saisie.<br><br>
+    Payeur : <span class="mono">SAMU</span> · Prescripteur : <span class="mono">NECKER</span><br>
+    Si aucune liaison indiquée → trajet fictif ex. <span class="mono">75015 à 75015</span><br>
+    Vérifier que la facture est à <strong>80 €</strong> puis facturer. Prestation → facture uniquement, rien d'autre.` },
+  { id:'lepez', icon:'ti-user', label:'M. LEPEZ — Dialyse', content:`
+    <strong>Adresses multiples :</strong><br>
+    · Domicile : <span class="mono">10 rue Obelin 77100 Meaux</span><br>
+    · Fille : <span class="mono">130 rue de Montceau 77470 Trilport</span><br>
+    · Neveu : <span class="mono">8 rue croix Saint Faron 77100 Meaux</span><br>
+    La régulation indique les bonnes adresses. Si absent → demande à la dialyse.` },
+  { id:'diop', icon:'ti-user', label:'M. DIOP — Dialyse', content:`
+    <strong>Adresses multiples :</strong><br>
+    · Domicile : Meaux<br>
+    · Enfant 1 : Emerainville<br>
+    · Enfant 2 : Ferrières-en-Brie` },
+  { id:'lomaco', icon:'ti-database', label:'LOMACO — Télétransmission', content:`
+    LOMACO permet la télétransmission directe de nombreuses factures.<br>
+    Factures SAMU → toujours en <strong>B2</strong>. Ne pas télétransmettre avant vérification RMG de fin de mois.<br>
+    EXDAT : <span class="mono">MASS11</span> / <span class="mono">Anjaly2026</span>` },
+  { id:'contacts', icon:'ti-phone', label:'Contacts utiles', content:`
+    <strong>SAMU 75 / NECKER :</strong> <span class="mono">0145675050</span> · <span class="mono">secretariat.samu75.nck@aphp.fr</span><br>
+    <strong>Fédération des ambulances :</strong> <span class="mono">0180918810</span>` }
+].map(s => `
+<div class="toggle-section">
+  <div class="toggle-header" data-toggle="${s.id}">
+    <span><i class="ti ${s.icon}" style="margin-right:8px;color:var(--teal)"></i>${s.label}</span>
+    <i class="ti ti-chevron-down" id="ticon-${s.id}"></i>
+  </div>
+  <div class="toggle-body" id="tbody-${s.id}" style="display:none">${s.content}</div>
+</div>`).join('')}`;
+}
+
+function renderRessources() {
+  return `
+<div class="content-header">
+  <h1>Ressources & protocoles</h1>
+  <p>Guides métier, documents téléchargeables, tutoriels</p>
+</div>
+
+<div class="grid-2 mb-16" style="margin-bottom:16px">
+  <div class="card card-hover" onclick="showPage('samu')">
+    <div class="card-title"><i class="ti ti-ambulance"></i>Guide saisie SAMU</div>
+    <p class="text-sm text-muted">7 étapes · UPH · CENTAURE · Croix de couleur</p>
+  </div>
+  <div class="card card-hover" onclick="showPage('regulation')">
+    <div class="card-title"><i class="ti ti-route"></i>Guide régulation & FDR</div>
+    <p class="text-sm text-muted">Checklist quotidienne · Concordance SCR · Clinique du Sport</p>
+  </div>
+  <div class="card card-hover" onclick="showPage('mutuelles')">
+    <div class="card-title"><i class="ti ti-key"></i>Accès mutuelles</div>
+    <p class="text-sm text-muted">Credentials AM · ACB · CBE · Boîte mail mutuelles</p>
+  </div>
+  <div class="card card-hover" onclick="showPage('cas')">
+    <div class="card-title"><i class="ti ti-file-description"></i>Cas particuliers</div>
+    <p class="text-sm text-muted">Sorties blanches · Dialyse · LOMACO · Contacts</p>
+  </div>
+</div>
+
+<div class="section-label">Documents téléchargeables</div>
+<div class="card">
+  <div class="alert alert-info">
+    <i class="ti ti-info-circle"></i>
+    <div>Vos documents (trames DUERP, protocoles PDF, modèles de courrier) seront disponibles ici. Déposez-les dans le dossier <span class="mono">Drive/ChronoDesk/Ressources/ANJALY</span> et ils apparaîtront automatiquement.</div>
+  </div>
+  <div style="text-align:center;padding:28px;color:var(--gray-400)">
+    <i class="ti ti-folder-open" style="font-size:36px;display:block;margin-bottom:8px;opacity:0.4"></i>
+    <p class="text-sm">Aucun document pour le moment</p>
+    <a href="#" class="btn btn-secondary btn-sm mt-12" style="margin-top:12px" onclick="event.preventDefault();showToast('Ouvre Drive/ChronoDesk/Ressources/ANJALY')">
+      <i class="ti ti-brand-google-drive"></i> Ouvrir le dossier Drive
+    </a>
+  </div>
+</div>
+
+<hr class="divider">
+<div class="section-label">Tutoriels vidéo</div>
+<div class="card">
+  <div class="alert alert-info">
+    <i class="ti ti-video"></i>
+    <div>Les tutoriels vidéo seront accessibles ici (liens YouTube privés ou Drive). Idéal pour les nouvelles collaboratrices en onboarding.</div>
+  </div>
+  <div style="text-align:center;padding:28px;color:var(--gray-400)">
+    <i class="ti ti-player-play" style="font-size:36px;display:block;margin-bottom:8px;opacity:0.4"></i>
+    <p class="text-sm">Aucun tutoriel pour le moment</p>
+  </div>
+</div>`;
+}
+
+function renderAnomalies() {
+  const open = state.anomalies.filter(a => a.status === 'open').length;
+  return `
+<div class="content-header">
+  <h1>Anomalies de facturation</h1>
+  <p>${state.anomalies.length} anomalie${state.anomalies.length>1?'s':''} · ${open} ouvert${open>1?'s':''}</p>
+</div>
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+  <div style="display:flex;gap:8px">
+    <select class="form-control" style="width:auto;font-size:12px" onchange="filterAnomalies(this.value)">
+      <option value="">Tous statuts</option>
+      <option value="open">Ouvert</option>
+      <option value="progress">En cours</option>
+      <option value="done">Résolu</option>
+    </select>
+    <select class="form-control" style="width:auto;font-size:12px">
+      <option value="">Toutes sociétés</option>
+      <option value="am">AM</option><option value="acb">ACB</option><option value="cbe">CBE</option>
+    </select>
+  </div>
+  <button class="btn btn-primary btn-sm" onclick="showPage('anomalies-new')">
+    <i class="ti ti-plus"></i> Nouvelle anomalie
+  </button>
+</div>
+
+<div class="card" style="padding:0;overflow:hidden">
+  <table class="anomaly-table">
+    <thead><tr>
+      <th>Anomalie</th><th>Société</th><th>Type</th><th>Priorité</th><th>Statut</th><th>Date</th>
+    </tr></thead>
+    <tbody>
+      ${state.anomalies.map(a => `
+      <tr onclick="openAnomalie(${a.id})">
+        <td>
+          <div class="anomaly-row-title">${a.title}</div>
+          <div class="anomaly-row-meta">${a.author} · ${a.files.length ? a.files.length+' fichier(s)' : 'Aucun fichier'}</div>
+        </td>
+        <td>${entityBadge(ENTITIES[a.entity]?.code || a.entity.toUpperCase())}</td>
+        <td><span class="badge badge-gray">${a.type}</span></td>
+        <td>${priorityBadge(a.priority)}</td>
+        <td>${statusBadge(a.status)}</td>
+        <td class="text-sm text-muted">${a.date}</td>
+      </tr>`).join('')}
+    </tbody>
+  </table>
+</div>`;
+}
+
+function renderAnomaliesNew() {
+  state.newAnomalieFiles = [];
+  return `
+<div class="content-header">
+  <h1>Nouvelle anomalie</h1>
+  <p>Le client sera notifié automatiquement par email à la création</p>
+</div>
+
+<div style="max-width:680px">
+  <div class="card mb-16" style="margin-bottom:16px">
+    <div class="card-title"><i class="ti ti-info-circle"></i>Informations</div>
+    <div class="form-group">
+      <label class="form-label">Titre de l'anomalie <span class="req">*</span></label>
+      <input class="form-control" id="an-title" placeholder="Ex : SAMU 25051193 — commune à vérifier">
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <select class="form-control" id="an-type">
+          <option value="facturation">Facturation</option>
+          <option value="mutuelle">Mutuelle</option>
+          <option value="samu">SAMU</option>
+          <option value="regulation">Régulation</option>
+          <option value="autre">Autre</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Priorité</label>
+        <select class="form-control" id="an-priority">
+          <option value="normal">Normal</option>
+          <option value="urgent">Urgent</option>
+          <option value="info">Information</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description <span class="req">*</span></label>
+      <textarea class="form-control" id="an-desc" placeholder="Décrire l'anomalie en détail. Indiquer les références (n° dossier, date, patient si nécessaire)..."></textarea>
+    </div>
+  </div>
+
+  <div class="card mb-16" style="margin-bottom:16px">
+    <div class="card-title"><i class="ti ti-paperclip"></i>Documents joints (PDF)</div>
+    <div class="drop-zone" id="drop-zone">
+      <i class="ti ti-cloud-upload"></i>
+      <p>Glisser les PDF ici ou cliquer pour sélectionner</p>
+      <span>FDR scannées, relevé SCR, fiche patient…</span>
+    </div>
+    <input type="file" id="file-input" accept=".pdf" multiple style="display:none">
+    <div id="file-list"></div>
+  </div>
+
+  <div class="alert alert-info mb-16" style="margin-bottom:16px">
+    <i class="ti ti-mail"></i>
+    <div>Un email de notification sera envoyé automatiquement au client avec les détails de l'anomalie et un lien pour déposer le document corrigé.</div>
+  </div>
+
+  <div style="display:flex;gap:10px">
+    <button class="btn btn-secondary" onclick="showPage('anomalies')">Annuler</button>
+    <button class="btn btn-primary" onclick="submitAnomalie()">
+      <i class="ti ti-send"></i> Créer l'anomalie
+    </button>
+  </div>
+</div>`;
+}
+
+function renderAnomalieDetail() {
+  const a = state.anomalies.find(x => x.id === state.currentAnomalie);
+  if (!a) return '<p>Anomalie introuvable.</p>';
+  return `
+<div style="margin-bottom:16px">
+  <button class="btn btn-ghost btn-sm" onclick="showPage('anomalies')">
+    <i class="ti ti-arrow-left"></i> Retour aux anomalies
+  </button>
+</div>
+
+<div style="max-width:720px">
+  <div class="card mb-16" style="margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+      <div>
+        <h2 style="font-size:17px;font-weight:600;color:var(--gray-800)">${a.title}</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          ${entityBadge(ENTITIES[a.entity]?.code || a.entity.toUpperCase())}
+          ${priorityBadge(a.priority)}
+          ${statusBadge(a.status)}
+          <span class="badge badge-gray">${a.type}</span>
+        </div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div class="text-xs text-muted">Créée le ${a.date}</div>
+        <div class="text-xs text-muted mt-4" style="margin-top:4px">par ${a.author}</div>
+      </div>
+    </div>
+    <hr class="divider">
+    <p style="font-size:13px;color:var(--gray-600);line-height:1.65">${a.desc}</p>
+  </div>
+
+  ${a.files.length ? `
+  <div class="card mb-16" style="margin-bottom:16px">
+    <div class="card-title"><i class="ti ti-paperclip"></i>Documents joints</div>
+    ${a.files.map(f => `
+    <div class="file-item mt-8" style="margin-top:8px">
+      <i class="ti ti-file-type-pdf file-icon"></i>
+      <span class="file-name">${f}</span>
+      <button class="btn btn-ghost btn-sm btn-icon" title="Télécharger"><i class="ti ti-download"></i></button>
+    </div>`).join('')}
+  </div>` : ''}
+
+  <div class="card mb-16" style="margin-bottom:16px">
+    <div class="card-title"><i class="ti ti-history"></i>Timeline</div>
+    <div class="anomalie-timeline">
+      <div class="timeline-item">
+        <div class="timeline-icon teal"><i class="ti ti-plus" style="font-size:13px"></i></div>
+        <div class="timeline-body">
+          <div class="timeline-title">Anomalie créée</div>
+          <div class="timeline-meta">${a.date} · ${a.author}</div>
+          <div class="timeline-content">Anomalie ouverte et notification client envoyée.</div>
+        </div>
+      </div>
+      ${a.status === 'progress' || a.status === 'done' ? `
+      <div class="timeline-item">
+        <div class="timeline-icon gold"><i class="ti ti-eye" style="font-size:13px"></i></div>
+        <div class="timeline-body">
+          <div class="timeline-title">Prise en charge</div>
+          <div class="timeline-meta">En cours de traitement</div>
+        </div>
+      </div>` : ''}
+      ${a.status === 'done' ? `
+      <div class="timeline-item">
+        <div class="timeline-icon green"><i class="ti ti-check" style="font-size:13px"></i></div>
+        <div class="timeline-body">
+          <div class="timeline-title">Anomalie résolue</div>
+          <div class="timeline-meta">Document corrigé validé</div>
+        </div>
+      </div>` : ''}
+    </div>
+  </div>
+
+  ${(state.role === 'client' && a.status !== 'done') ? `
+  <div class="card mb-16" style="margin-bottom:16px">
+    <div class="card-title"><i class="ti ti-upload"></i>Déposer le document corrigé</div>
+    <div class="drop-zone" id="drop-zone">
+      <i class="ti ti-cloud-upload"></i>
+      <p>Glisser le PDF corrigé ici</p>
+      <span>Document corrigé suite à l'anomalie signalée</span>
+    </div>
+    <input type="file" id="file-input" accept=".pdf" style="display:none">
+    <div id="file-list"></div>
+    <div style="margin-top:12px">
+      <button class="btn btn-primary btn-sm" onclick="submitCorrection(${a.id})">
+        <i class="ti ti-send"></i> Envoyer le correctif
+      </button>
+    </div>
+  </div>` : ''}
+
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    ${a.status === 'open' ? `<button class="btn btn-secondary btn-sm" onclick="updateStatus(${a.id},'progress')"><i class="ti ti-progress"></i> Marquer en cours</button>` : ''}
+    ${a.status !== 'done' ? `<button class="btn btn-primary btn-sm" onclick="updateStatus(${a.id},'done')"><i class="ti ti-check"></i> Marquer résolu</button>` : ''}
+    ${a.status === 'done' ? `<button class="btn btn-ghost btn-sm" onclick="updateStatus(${a.id},'open')"><i class="ti ti-refresh"></i> Rouvrir</button>` : ''}
+  </div>
+</div>`;
+}
+
+function submitCorrection(id) {
+  const a = state.anomalies.find(x => x.id === id);
+  if (!a) return;
+  a.status = 'done';
+  a.correction = new Date().toLocaleDateString('fr-FR');
+  updateBadge();
+  showToast('Correctif déposé. La collaboratrice a été notifiée.');
+  showPage('anomalie-detail');
+}
+
+function renderFDR() {
+  return `
+<div class="content-header">
+  <h1>Feuilles de route · Google Drive</h1>
+  <p>Accès direct aux FDR scannées par société</p>
+</div>
+
+<div class="alert alert-info mb-16" style="margin-bottom:16px">
+  <i class="ti ti-brand-google-drive"></i>
+  <div>Les FDR sont scannées et déposées directement dans Google Drive. Cliquez sur la société pour accéder au dossier correspondant.</div>
+</div>
+
+<div class="grid-3 mb-16" style="margin-bottom:16px">
+  <div class="card card-hover" onclick="showToast('Ouverture Drive · ANJALY AM…');window.open('https://drive.google.com','_blank')">
+    <div class="card-title"><i class="ti ti-folder" style="color:#1a6b8a"></i>Ambulances ANJALY</div>
+    <p class="text-sm text-muted">FDR · Véhicule 455</p>
+    <div style="margin-top:10px"><span class="badge badge-teal">AM</span></div>
+  </div>
+  <div class="card card-hover" onclick="showToast('Ouverture Drive · ACB…');window.open('https://drive.google.com','_blank')">
+    <div class="card-title"><i class="ti ti-folder" style="color:#f0a500"></i>ANJALY Chanteloup</div>
+    <p class="text-sm text-muted">FDR · Véhicule 589</p>
+    <div style="margin-top:10px"><span class="badge badge-gold">ACB</span></div>
+  </div>
+  <div class="card card-hover" onclick="showToast('Ouverture Drive · CBE…');window.open('https://drive.google.com','_blank')">
+    <div class="card-title"><i class="ti ti-folder" style="color:#1a7a4a"></i>CBE</div>
+    <p class="text-sm text-muted">FDR · Véhicule —</p>
+    <div style="margin-top:10px"><span class="badge badge-green">CBE</span></div>
+  </div>
+</div>
+
+<div class="section-label">Organisation recommandée des dossiers Drive</div>
+<div class="card card-sm">
+  <div style="font-family:monospace;font-size:12px;color:var(--gray-600);line-height:2">
+    📁 ChronoDesk/<br>
+    &nbsp;&nbsp;📁 ANJALY/<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;📁 FDR/<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📁 2026-07/ · 📁 2026-06/ · …<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;📁 Anomalies/<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📄 [ID]_titre_anomalie.pdf<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;📁 Ressources/<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📄 Protocoles, trames…<br>
+    &nbsp;&nbsp;📁 ACB/ · 📁 CBE/
+  </div>
+</div>`;
+}
+
+/* ═══ INIT ═══ */
+updateBadge();
+</script>
+</body>
+</html>
